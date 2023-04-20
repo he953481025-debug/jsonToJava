@@ -1,5 +1,6 @@
 package com.hejincai.jsontojavaproject.definition;
 
+import java.io.File;
 import java.util.*;
 
 /**
@@ -44,13 +45,35 @@ public class JavaDefinition extends AbstractDefinition {
      */
     private Map<String, FieldDefinition> fieldMap;
 
+    /**
+     * 方法列表
+     */
     private List<MethodArgDefinition> methodList;
 
+    /**
+     * 字段列表
+     */
+    private List<FieldDefinition> fieldList;
 
     /**
      * 路径
      */
     private String path;
+
+    private Boolean swagger;
+
+    private Boolean lombok;
+
+    /**
+     * 自定义配置
+     */
+    private Map<String, Object> customizedConfig;
+
+    public String getFileAbsPathName() {
+        String path = getPath()+ File.separatorChar + super.getPackageName().replace('.', File.separatorChar);
+        String fileName = path + File.separator + getName() + ".java";
+        return fileName;
+    }
 
     public Set<String> getImports() {
         return imports;
@@ -84,7 +107,10 @@ public class JavaDefinition extends AbstractDefinition {
         if (this.fieldMap == null) {
             this.fieldMap = new HashMap<String, FieldDefinition>();
         }
-
+        if (this.fieldList == null) {
+            this.fieldList = new ArrayList<>();
+        }
+        this.fieldList.add(field);
         this.fieldMap.put(field.getFieldName(), field);
     }
 
@@ -102,6 +128,62 @@ public class JavaDefinition extends AbstractDefinition {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public List<MethodArgDefinition> getMethodList() {
+        return methodList;
+    }
+
+    public void setMethodList(List<MethodArgDefinition> methodList) {
+        this.methodList = methodList;
+    }
+
+    public List<FieldDefinition> getFieldList() {
+        return fieldList;
+    }
+
+    public void setFieldList(List<FieldDefinition> fieldList) {
+        this.fieldList = fieldList;
+    }
+
+    public Boolean getSwagger() {
+        return swagger;
+    }
+
+    public void setSwagger(Boolean swagger) {
+        this.swagger = swagger;
+    }
+
+    public Boolean getLombok() {
+        return lombok;
+    }
+
+    public void setLombok(Boolean lombok) {
+        this.lombok = lombok;
     }
 
     public static class MethodDefinition {

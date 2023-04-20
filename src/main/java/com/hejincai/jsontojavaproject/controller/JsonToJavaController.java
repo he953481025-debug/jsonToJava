@@ -1,11 +1,12 @@
 package com.hejincai.jsontojavaproject.controller;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.hejincai.jsontojavaproject.config.AppConfig;
 import com.hejincai.jsontojavaproject.definition.JavaDefinition;
 import com.hejincai.jsontojavaproject.domain.JsonToJavaParam;
-import com.hejincai.jsontojavaproject.output.JavaFileOutput;
-import com.hejincai.jsontojavaproject.output.JavaOutput;
-import com.hejincai.jsontojavaproject.parser.IJsonParser;
+import com.hejincai.jsontojavaproject.generator.engine.AbstractTemplateEngine;
+import com.hejincai.jsontojavaproject.generator.engine.FreemarkerTemplateEngine;
+import com.hejincai.jsontojavaproject.parser.IParser;
 import com.hejincai.jsontojavaproject.parser.JacksonParser;
 import lombok.SneakyThrows;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,14 +27,11 @@ public class JsonToJavaController {
     @SneakyThrows
     @PostMapping()
     public List<String> jsonToJava(@RequestBody JsonToJavaParam javaParam) {
-        AppConfig appConfig = new AppConfig();
-        appConfig.setOutPath(javaParam.getPathPrefix());
-        appConfig.setPackageName(javaParam.getPackageName());
-        appConfig.setRootClass(javaParam.getClassName());
-        IJsonParser jsonParser = new JacksonParser(javaParam);
-        JavaDefinition root = jsonParser.parse(javaParam.getInputJson());
-        JavaOutput output = new JavaFileOutput(appConfig);
-        return output.print(root);
+        AppConfig appConfig = BeanUtil.toBean(javaParam, AppConfig.class);
+        IParser jsonParser = new JacksonParser(appConfig);
+        List<JavaDefinition> javaDefinitionList = jsonParser.parseObjToList(javaParam.getInputJson());
+        AbstractTemplateEngine templateEngine = new FreemarkerTemplateEngine();
+        return templateEngine.batchWriter(javaDefinitionList, "pojo.ftl");
     }
 
 

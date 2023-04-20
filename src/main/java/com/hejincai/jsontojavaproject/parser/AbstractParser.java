@@ -1,12 +1,10 @@
 package com.hejincai.jsontojavaproject.parser;
 
 import cn.hutool.core.util.StrUtil;
+import com.hejincai.jsontojavaproject.config.AppConfig;
 import com.hejincai.jsontojavaproject.definition.JavaDefinition;
-import com.hejincai.jsontojavaproject.domain.JsonToJavaParam;
 
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -14,7 +12,7 @@ import java.util.Map;
 /**
  * Created by hujunzhon on 2019/2/28.
  */
-public abstract class AbstractJsonParser implements IJsonParser {
+public abstract class AbstractParser implements IParser {
 
     private static Map<String, String> fieldMap = new HashMap<>();
 
@@ -25,25 +23,14 @@ public abstract class AbstractJsonParser implements IJsonParser {
         fieldMap.put("package", "pack");
     }
 
-    protected JsonToJavaParam jsonToJavaParam;
+    protected AppConfig appConfig;
 
-    public AbstractJsonParser(JsonToJavaParam javaParam) {
-        this.jsonToJavaParam = javaParam;
+    public AbstractParser(AppConfig appConfig) {
+        this.appConfig = appConfig;
     }
 
-    protected abstract void doParse(JavaDefinition rootDefinition, String json);
+    protected abstract void doParse(JavaDefinition rootDefinition, String str);
 
-    protected String getDftPackage() {
-        return jsonToJavaParam.getPackageName();
-    }
-
-    protected String buildDftNote() {
-
-        return String.format("/**\n" +
-                "  * @since " + LocalDateTime.now().format(timeFormatter) + "\n" +
-                "  * @author " + jsonToJavaParam.getAuthor() + "\n" +
-                "  */", new Date());
-    }
 
     /**
      * javabean规范格式化field
@@ -100,12 +87,9 @@ public abstract class AbstractJsonParser implements IJsonParser {
 
 
     @Override
-    public JavaDefinition parse(String jsonStr) {
+    public JavaDefinition parse(String str) {
         JavaDefinition rootDefinition = new JavaDefinition();
-        rootDefinition.setPackageName(getDftPackage());
-        rootDefinition.setName(jsonToJavaParam.getClassName());
-        rootDefinition.setNote(buildDftNote());
-        doParse(rootDefinition, jsonStr);
+        doParse(rootDefinition, str);
         return rootDefinition;
     }
 

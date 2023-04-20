@@ -1,35 +1,32 @@
 package ${cfg.packageName};
 
 
-<#list definition.imports as importStr>
+<#list cfg.imports as importStr>
 import  ${importStr};
 </#list>
 
 /**
-* ${definition.note!}
-* @author ${author}
-* @since ${date}
+* ${cfg.desc!}
+* @author ${cfg.author}
+* @since ${cfg.date}
 */
-<#if swagger2>
-    @ApiModel(description="${cfg.note!}")
+<#if cfg.swagger>
+@ApiModel(description="${cfg.desc!}")
 </#if>
-public class ${cfg.rootClass} {
+<#if cfg.lombok>
+@Data
+</#if>
+public class ${cfg.name} {
 
 <#-- ----------  BEGIN 字段循环遍历  ---------->
-<#list definition.fieldMap as field>
-
-    <#if field.note!?length gt 0>
-        <#if swagger2>
-            @ApiModelProperty(value = "${field.note}")
-        </#if>
-    </#if>
+<#list cfg.fieldList as field>
     <#list field.annotations as annotation>
-        ${annotation}
+    ${annotation}
     </#list>
     <#if field.array>
-        private List<${field.type.name}> ${field.fieldName};
+    private List<${field.type.name}> ${field.fieldName};
     <#else>
-        private ${field.type.name} ${field.fieldName};
+    private ${field.type.name} ${field.fieldName};
     </#if>
 
 </#list>
