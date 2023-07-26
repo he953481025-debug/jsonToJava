@@ -1,5 +1,6 @@
 package com.hejincai.jsontojavaproject.parser;
 
+import cn.hutool.core.collection.CollUtil;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -133,6 +134,10 @@ public class JacksonParser extends AbstractParser {
     private static void recursionExtractJavaDefinition(JavaDefinition root, List<JavaDefinition> javaDefinitionList) {
         javaDefinitionList.add(root);
         List<JavaDefinition.FieldDefinition> fieldList = root.getFieldList();
+        if (CollUtil.isEmpty(fieldList)) {
+            root.setFieldList(new ArrayList<>());
+            return;
+        }
         for (JavaDefinition.FieldDefinition fieldDefinition : fieldList) {
             AbstractDefinition type = fieldDefinition.getType();
             if (type instanceof JavaDefinition) {
